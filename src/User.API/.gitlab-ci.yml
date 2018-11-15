@@ -1,0 +1,23 @@
+stages:
+  - build
+  - test
+  - package
+  - deploy
+job1:
+  stage: build
+  script:
+    - dotnet build
+job2:
+  stage: test
+  script: 
+    - cd User.API.UnitTests
+    - dotnet test
+job3:
+  stage: package
+  script:
+    - cd User.API
+    - docker build -t userapi:test .
+job4:
+  stage: deploy
+  script: 
+    - docker run -d -p 30080:30080 --link mysql01:db --name userapi userapi:test
