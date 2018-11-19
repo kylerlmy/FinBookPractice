@@ -1,5 +1,7 @@
 ﻿using DnsClient;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Resilience.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +14,11 @@ namespace User.Identity.Services
 {
     public class UserService : IUserService
     {
-        private HttpClient _httpClient;
+        private IHttpClient _httpClient;
         private readonly string _userServiceUrl;//="http://localhost:51929";
+        private ILogger<UserService> _logger;
 
-        public UserService(HttpClient httpClient, IOptions<ServiceDiscoveryOptions> serviceDiscoveryOptions, IDnsQuery dnsQuery)
+        public UserService(IHttpClient httpClient, IOptions<ServiceDiscoveryOptions> serviceDiscoveryOptions, IDnsQuery dnsQuery, ILogger<UserService> logger)
         {
             _httpClient = httpClient;
 
@@ -29,15 +32,25 @@ namespace User.Identity.Services
 
             _userServiceUrl = $"http://{host.Replace(".", "")}:{port}";
 
+            _logger = logger;
+
         }
         public async Task<int> CheckOrCreate(string phone)
         {
             var form = new Dictionary<string, string> { { "phone", phone } };
-            var content = new FormUrlEncodedContent(form);
             var requestUrl = $"{_userServiceUrl}/api/users/check-or-create";
-            var response = await _httpClient.PostAsync(requestUrl, content);
 
-            if (response.StatusCode == HttpStatusCode.OK)
+            HttpResponseMessage response = null;
+            try
+            {
+                response = await _httpClient.PostAsync(requestUrl, form);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("CheckOrCreate 在重试之后失败" + ex.Message + ex.StackTrace);
+            }
+
+            if (response?.StatusCode == HttpStatusCode.OK)
             {
                 var userId = await response.Content.ReadAsStringAsync();
 

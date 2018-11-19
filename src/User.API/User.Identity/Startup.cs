@@ -10,9 +10,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Resilience.Http;
 using User.Identity.Authentication;
 using User.Identity.Dtos;
+using User.Identity.Infrastructure;
 using User.Identity.Services;
 
 namespace User.Identity
@@ -47,7 +50,22 @@ namespace User.Identity
                 return new LookupClient(serviceConfiguration.Consul.DnsEndpoint.ToIPEndPoint());
             });
 
-            services.AddSingleton(new HttpClient());
+            //注册全局单例ResilientHttpClientFactory
+            services.AddSingleton(typeof(ResilientHttpClientFactory), sp =>
+            {
+                var logger = sp.GetRequiredService<ILogger<ResilienceHttpClient>>();
+                var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+                var retryCount = 5;
+                var exceptionCountAllowedBeforeBreaking = 5;
+                return new ResilientHttpClientFactory(logger, httpContextAccessor, retryCount, exceptionCountAllowedBeforeBreaking);
+            });
+            //注册全局实例IHttpClient
+            services.AddSingleton<IHttpClient>(sp =>
+            {
+                return sp.GetRequiredService<ResilientHttpClientFactory>().GetResilienceHttpClient();
+            });
+
+            //services.AddSingleton(new HttpClient());
             services.AddScoped<IAuthCodeService, TestAuthCodeService>();
             services.AddScoped<IUserService, UserService>();
             services.AddMvc();

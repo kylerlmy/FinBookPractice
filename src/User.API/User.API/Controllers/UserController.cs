@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.JsonPatch;
+using System.Net.Http;
 
 namespace User.API.Controllers
 {
@@ -97,6 +98,11 @@ namespace User.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CheckOrCreate(string phone)
         {
+
+#if Polly
+            //Polly 重试和熔断测试
+            throw new HttpRequestException();
+#else
             //TODO: 做手机号码的格式验证
 
             var user = await _userContext.Users.SingleOrDefaultAsync(u => u.Phone == phone);
@@ -109,6 +115,9 @@ namespace User.API.Controllers
             }
 
             return Ok(user.Id);
+
+#endif
         }
+
     }
 }
