@@ -6,6 +6,8 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.JsonPatch;
 using System.Net.Http;
+using System.Collections.Generic;
+using System;
 
 namespace User.API.Controllers
 {
@@ -110,13 +112,60 @@ namespace User.API.Controllers
             {
                 user = new Models.AppUser { Phone = phone };
                 _userContext.Users.Add(user);
-               await _userContext.SaveChangesAsync();
+                await _userContext.SaveChangesAsync();
                 //_userContext.Users.Add(new Models.AppUser { Phone = phone });
             }
 
             return Ok(user.Id);
 
 #endif
+        }
+
+        /// <summary>
+        /// 获取用户标签选项数据
+        /// </summary>
+        /// <returns></returns>
+        /// 
+        [Route("tags")]
+        [HttpGet]
+        public async Task<IActionResult> GetUserTags()
+        {
+            return Ok(await _userContext.UserTags.Where(u => u.UserId == UserIdentity.UserId).ToListAsync());
+        }
+
+        /// <summary>
+        /// 根据手机号码，查找用户资料
+        /// </summary>
+        /// <returns></returns>
+        [Route("search")]
+        [HttpPost]
+        public async Task<IActionResult> Search(string phone)
+        {
+            return Ok(await _userContext.Users.Include(u => u.Properties).SingleOrDefaultAsync(u => u.Phone == phone));
+        }
+
+        /// <summary>
+        /// 更新用户标签数据
+        /// </summary>
+        /// <returns></returns>
+        [Route("tags")]
+        [HttpPut]
+        public async Task<IActionResult> UpdateUserTags([FromBody]List<string> tags)
+        {
+            var originTags = await _userContext.UserTags.Where(u => u.UserId == UserIdentity.UserId).ToListAsync();
+
+            var newTags = tags.Except(originTags.Select(t => t.Tag));
+
+            await _userContext.UserTags.AddRangeAsync(newTags.Select(t => new Models.UserTag
+            {
+                CreatedTime = DateTime.Now,
+                UserId = UserIdentity.UserId,
+                Tag = t
+            }));
+
+           await _userContext.SaveChangesAsync();
+
+            return Ok();
         }
 
     }
