@@ -9,6 +9,6 @@ namespace Contact.API.Controllers
 {
     public class BaseController:Controller
     {
-        protected UserIdentity UserIdentity => new UserIdentity { UserId = 1, Name = "kyle" };
+        protected UserIdentity UserIdentity => new UserIdentity { UserId = 1/*, Name = "kyle"*/ };
     }
 }

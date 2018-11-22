@@ -21,7 +21,7 @@ namespace Contact.API.Data
             var client = new MongoClient(_appSettings.MongoContactConnectionString);
             if (client != null)
             {
-                _database = client.GetDatabase(_appSettings.MongoContactConnectionString)
+                _database = client.GetDatabase(_appSettings.MongoContactConnectionString);
             }
         }
         private void CheckAndCreateCollection(string collectionName)

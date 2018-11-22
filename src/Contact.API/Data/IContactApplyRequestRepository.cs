@@ -20,7 +20,7 @@ namespace Contact.API.Data
         /// </summary>
         /// <param name="applierId"></param>
         /// <returns></returns>
-        Task<bool> ApprovalAsync(int applierId, CancellationToken cancellationToken);
+        Task<bool> ApprovalAsync(int userId,int applierId, CancellationToken cancellationToken);
         /// <summary>
         /// 获取好友申请列表
         /// </summary>

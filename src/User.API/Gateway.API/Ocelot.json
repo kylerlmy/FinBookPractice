@@ -27,6 +27,42 @@
       ],
       "UpstreamPathTemplate": "/connect/token",
       "UpstreamHttpMethod": [ "Post" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Contacts",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 57794
+        }
+      ],
+      "UpstreamPathTemplate": "/Contacts",
+      "UpstreamHttpMethod": [ "Get" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Contacts/tag",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 57794
+        }
+      ],
+      "UpstreamPathTemplate": "/Contacts/tag",
+      "UpstreamHttpMethod": [ "Put" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Contacts/apply-requests",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 57794
+        }
+      ],
+      "UpstreamPathTemplate": "/Contacts/apply-requests",
+      "UpstreamHttpMethod": [ "Get","Put","Post" ]
     }
 
   ],

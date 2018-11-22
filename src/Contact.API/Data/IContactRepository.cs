@@ -17,6 +17,30 @@ namespace Contact.API.Data
         /// </summary>
         /// <param name="userinfo"></param>
         /// <returns></returns>
-        Task<bool> UpdateContactInfo(BaseUseInfo userinfo, CancellationToken cancellationToken);
+        Task<bool> UpdateContactInfoAsync(BaseUseInfo userinfo, CancellationToken cancellationToken);
+        /// <summary>
+        /// 添加联系人信息
+        /// </summary>
+        /// <param name="contact"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<bool> AddContactAsync(int userId, BaseUseInfo contact, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// 获取联系人列表
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<List<Models.Contact>> GetContactsAsync(int userId, CancellationToken cancellationToken);
+        /// <summary>
+        /// 更新好友标签
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="contactId"></param>
+        /// <param name="tags"></param>
+        /// <returns></returns>
+        Task<bool> TagContactAsync(int userId,int contactId,List<string> tags, CancellationToken cancellationToken);
+
+
     }
 }
