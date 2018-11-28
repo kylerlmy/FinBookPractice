@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DnsClient;
+using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -41,6 +42,7 @@ namespace User.Identity
             .AddInMemoryApiResources(Config.GetApiResources())
             .AddInMemoryIdentityResources(Config.GetIdentityResources());
 
+
             //将配置文件中的内容进行注入
             services.Configure<Dtos.ServiceDiscoveryOptions>(Configuration.GetSection("ServiceDiscovery"));
 
@@ -68,6 +70,8 @@ namespace User.Identity
             //services.AddSingleton(new HttpClient());
             services.AddScoped<IAuthCodeService, TestAuthCodeService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddTransient<IProfileService, ProfileService>();
+
             services.AddMvc();
         }
 

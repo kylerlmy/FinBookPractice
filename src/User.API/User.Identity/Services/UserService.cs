@@ -1,6 +1,7 @@
 ﻿using DnsClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Resilience.Http;
 using System;
 using System.Collections.Generic;
@@ -35,7 +36,7 @@ namespace User.Identity.Services
             _logger = logger;
 
         }
-        public async Task<int> CheckOrCreate(string phone)
+        public async Task<UserInfo> CheckOrCreate(string phone)
         {
             var form = new Dictionary<string, string> { { "phone", phone } };
             var requestUrl = $"{_userServiceUrl}/api/users/check-or-create";
@@ -52,14 +53,16 @@ namespace User.Identity.Services
 
             if (response?.StatusCode == HttpStatusCode.OK)
             {
-                var userId = await response.Content.ReadAsStringAsync();
+                //var userId = await response.Content.ReadAsStringAsync();
+                //int.TryParse(userId, out var intUserId);
+                //return intUserId;
+                var result = await response.Content.ReadAsStringAsync();
+                var userInfo = JsonConvert.DeserializeObject<UserInfo>(result);
 
-                int.TryParse(userId, out var intUserId);
-
-                return intUserId;
+                return userInfo;
             }
 
-            return 0;
+            return null;
         }
     }
 }

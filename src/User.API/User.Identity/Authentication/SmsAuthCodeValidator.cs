@@ -3,6 +3,7 @@ using IdentityServer4.Validation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using User.Identity.Services;
 
@@ -40,16 +41,25 @@ namespace User.Identity.Authentication
             }
 
             //完成用户注册
-            var userId = await _userService.CheckOrCreate(phone);//如果请求路径不对，例如在UserService的_userServiceUrl的变量中忘记添加http://执行到这里就不会继续进行了，并在postman中提示 "error": "invalid_grant"
+            var userInfo = await _userService.CheckOrCreate(phone);//如果请求路径不对，例如在UserService的_userServiceUrl的变量中忘记添加http://执行到这里就不会继续进行了，并在postman中提示 "error": "invalid_grant"
 
-            if (userId <= 0)
+            if (userInfo == null)
             {
                 context.Result = errorValidationResult;
                 return;
             }
 
+            var claims = new Claim[] {
+                new Claim("name",userInfo.Name??string.Empty),
+                new Claim("company",userInfo.Company??string.Empty),
+                new Claim("title",userInfo.Title??string.Empty),
+                new Claim("avatar",userInfo.Avatar??string.Empty),
+            };
 
-            context.Result = new GrantValidationResult(userId.ToString(), GrantType);
+            //context.Result = new GrantValidationResult(userId.ToString(), GrantType);
+
+            context.Result = new GrantValidationResult(userInfo.UserId.ToString(), GrantType, claims);
+
         }
     }
 }

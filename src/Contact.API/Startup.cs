@@ -43,7 +43,7 @@ namespace Contact.API
                         services.AddScoped<IUserService, UserService>();
             =======*/
 
-            services.Configure<AppSettings>(
+            services.Configure<Settings>(
                 options =>
                 {
                     options.ConnectionString = Configuration.GetSection("MongoDb:ConnectionString").Value;

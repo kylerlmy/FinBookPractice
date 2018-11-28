@@ -30,8 +30,7 @@
     },
     {
       "DownstreamPathTemplate": "/api/Contacts",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
+       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
           "Port": 57794
