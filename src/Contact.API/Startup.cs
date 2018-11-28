@@ -26,22 +26,34 @@ namespace Contact.API
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-
         {
+            /*<<<<<<< HEAD
 
-            services.Configure<Settings>(options =>
-            {
-                options.ConnectionString
-                    = Configuration.GetSection("MongoConnection:ConnectionString").Value;
-                options.Database
-                    = Configuration.GetSection("MongoConnection:Database").Value;
-            });
-            //services.AddScoped<IContactContext, ContactContext>();
-            services.AddScoped<IContactContext>(sp => sp.GetService<ContactContext>());
-            services.AddScoped<IContactRepository, MongoContactRepository>();
-            services.AddScoped<IContactApplyRequestRepository, MongoContactApplyRequestRepository>();
-            services.AddScoped<IUserService, UserService>();
+                        services.Configure<Settings>(options =>
+                        {
+                            options.ConnectionString
+                                = Configuration.GetSection("MongoConnection:ConnectionString").Value;
+                            options.Database
+                                = Configuration.GetSection("MongoConnection:Database").Value;
+                        });
+                        //services.AddScoped<IContactContext, ContactContext>();
+                        services.AddScoped<IContactContext>(sp => sp.GetService<ContactContext>());
+                        services.AddScoped<IContactRepository, MongoContactRepository>();
+                        services.AddScoped<IContactApplyRequestRepository, MongoContactApplyRequestRepository>();
+                        services.AddScoped<IUserService, UserService>();
+            =======*/
 
+            services.Configure<AppSettings>(
+                options =>
+                {
+                    options.ConnectionString = Configuration.GetSection("MongoDb:ConnectionString").Value;
+                    options.Database = Configuration.GetSection("MongoDb:Database").Value;
+                });
+
+            services.AddTransient<IContactContext, ContactContext>();
+            services.AddTransient<IContactRepository, MongoContactRepository>();
+            services.AddTransient<IContactApplyRequestRepository, MongoContactApplyRequestRepository>();
+            services.AddTransient<IUserService, UserService>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 

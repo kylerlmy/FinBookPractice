@@ -10,8 +10,8 @@ namespace Contact.API.Data
 {
     public class MongoContactApplyRequestRepository : IContactApplyRequestRepository
     {
-        private readonly ContactContext _contactContext;
-        public MongoContactApplyRequestRepository(ContactContext contactContext)
+        private readonly IContactContext _contactContext;
+        public MongoContactApplyRequestRepository(IContactContext contactContext)
         {
             _contactContext = contactContext;
         }
@@ -21,7 +21,7 @@ namespace Contact.API.Data
 
 #if !overTimeVersion
 
-            if ((await _contactContext.ContactApplyRequests.CountAsync(filter)) > 0)
+            if ((await _contactContext.ContactApplyRequests.CountDocumentsAsync(filter, cancellationToken: cancellationToken)) > 0)
             {
                 var update = Builders<ContactApplyRequest>.Update.Set(r => r.ApplyTime, DateTime.Now);
                 var result = await _contactContext.ContactApplyRequests.UpdateOneAsync(filter, update, null, cancellationToken);
