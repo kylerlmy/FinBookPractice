@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Contact.API.Controllers
 {
-    [Route("api/[Contacts]")]
+    [Route("api/Contacts")]
     //[ApiController]
     public class ContactController : BaseController
     {

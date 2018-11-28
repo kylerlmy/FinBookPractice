@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Contact.API.Data
 {
-    public class ContactContext
+    public class ContactContext : IContactContext
     {
         private IMongoDatabase _database;
         private IMongoCollection<ContactBook> _collection;
@@ -18,11 +18,8 @@ namespace Contact.API.Data
         {
             _appSettings = settings.Value;
 
-            var client = new MongoClient(_appSettings.MongoContactConnectionString);
-            if (client != null)
-            {
-                _database = client.GetDatabase(_appSettings.MongoContactConnectionString);
-            }
+            var client = new MongoClient(_appSettings.ConnectionString);
+            _database = client.GetDatabase(_appSettings.Database);
         }
         private void CheckAndCreateCollection(string collectionName)
         {

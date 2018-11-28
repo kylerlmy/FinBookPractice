@@ -12,8 +12,8 @@ namespace Contact.API.Data
     public class MongoContactRepository : IContactRepository
     {
 
-        private readonly ContactContext _contactContext;
-        public MongoContactRepository(ContactContext contactContext)
+        private readonly IContactContext _contactContext;
+        public MongoContactRepository(IContactContext contactContext)
         {
             _contactContext = contactContext;
         }
@@ -21,9 +21,9 @@ namespace Contact.API.Data
         public async Task<bool> AddContactAsync(int userId, BaseUseInfo contact, CancellationToken cancellationToken)
         {
 
-            if (_contactContext.ContactBooks.Count(c => c.UserId == userId) == 0)
+            if (await _contactContext.ContactBooks.CountDocumentsAsync(c => c.UserId == userId, cancellationToken: cancellationToken) == 0)
             {
-                await _contactContext.ContactBooks.InsertOneAsync(new ContactBook { UserId = userId });
+                await _contactContext.ContactBooks.InsertOneAsync(new ContactBook { UserId = userId }, cancellationToken: cancellationToken);
             }
 
 
@@ -45,7 +45,7 @@ namespace Contact.API.Data
 
         public async Task<List<Models.Contact>> GetContactsAsync(int userId, CancellationToken cancellationToken)
         {
-            var contactBook = (await _contactContext.ContactBooks.FindAsync(c => c.UserId == userId)).FirstOrDefault(cancellationToken);
+            var contactBook = (await _contactContext.ContactBooks.FindAsync(c => c.UserId == userId, cancellationToken: cancellationToken)).FirstOrDefault(cancellationToken);
 
             if (contactBook != null)
             {
