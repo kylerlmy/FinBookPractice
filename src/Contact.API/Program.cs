@@ -19,6 +19,7 @@ namespace Contact.API
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration(builder => { builder.AddJsonFile("appsettings.json", false, true); })
                 .UseStartup<Startup>();
     }
 }
