@@ -22,6 +22,7 @@ namespace User.Identity
                         new Secret("secret".Sha256())
                     },
                     RefreshTokenExpiration=TokenExpiration.Sliding,//滑动
+                    AlwaysSendClientClaims = true,
                     AllowOfflineAccess=true,
                     RequireClientSecret=false,
                     AllowedGrantTypes = new List<string>{ "sms_auth_code"},
@@ -42,6 +43,7 @@ namespace User.Identity
                     },
                     RefreshTokenExpiration=TokenExpiration.Sliding,//滑动
                     AllowOfflineAccess=true,
+                    AlwaysSendClientClaims = true,
                     RequireClientSecret=false,
                     AllowedGrantTypes = new List<string>{ "sms_auth_code"},
                     AlwaysIncludeUserClaimsInIdToken=true,//将Claims加入到Token里面去
