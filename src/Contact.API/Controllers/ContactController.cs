@@ -27,7 +27,7 @@ namespace Contact.API.Controllers
             _userService = userService;
             _contactRepository = contactRepository;
         }
-        [HttpGet]
+        [HttpGet]   
         [Route("")]
         public async Task<IActionResult> Get(CancellationToken cancellationToken)
         {
@@ -64,7 +64,7 @@ namespace Contact.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Route("apply-requests")]
+        [Route("apply-requests/{userId}")]
         public async Task<IActionResult> AddApplyRequest(int userId, CancellationToken cancellationToken)
         {
             var userBaseInfo = await _userService.GetBaseUseInfoAsync(userId);
@@ -105,7 +105,7 @@ namespace Contact.API.Controllers
         {
             var result = await _contactApplyRequestRepository.ApprovalAsync(UserIdentity.UserId, applierId, cancellationToken);
 
-            if (!result)
+            if (!result)    
             {
                 //log tdb
                 return BadRequest();
@@ -115,8 +115,8 @@ namespace Contact.API.Controllers
             var applier = await _userService.GetBaseUseInfoAsync(applierId);
             var userInfo = await _userService.GetBaseUseInfoAsync(UserIdentity.UserId);
 
-            await _contactRepository.AddContactAsync(UserIdentity.UserId, userInfo, cancellationToken);
-            await _contactRepository.AddContactAsync(applierId, applier, cancellationToken);
+            await _contactRepository.AddContactAsync(UserIdentity.UserId, applier, cancellationToken);
+            await _contactRepository.AddContactAsync(applierId, userInfo , cancellationToken);
 
 
             return Ok();

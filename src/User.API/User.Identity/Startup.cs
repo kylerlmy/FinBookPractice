@@ -35,9 +35,6 @@ namespace User.Identity
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<IAuthCodeService, TestAuthCodeService>();
-            services.AddScoped<IUserService, UserService>();
-            services.AddTransient<IProfileService, ProfileService>();
 
             services.AddIdentityServer()
             .AddExtensionGrantValidator<Authentication.SmsAuthCodeValidator>()//添加自定义验证
@@ -72,7 +69,10 @@ namespace User.Identity
             });
 
             //services.AddSingleton(new HttpClient());
-           
+
+            services.AddScoped<IAuthCodeService, TestAuthCodeService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddTransient<IProfileService, ProfileService>();
 
             services.AddMvc();
         }

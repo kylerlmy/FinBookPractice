@@ -10,14 +10,30 @@
         }
       ],
       "UpstreamPathTemplate": "/users",
-      "UpstreamHttpMethod": [ "Get" ],
+      "UpstreamHttpMethod": [ "Get", "Patch" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "finbook",
-        "AllowedScopes": []
+        "AllowedScopes": [ "user_api" ]
       }
     },
     {
-      "DownstreamPathTemplate": "/connect/token",
+      "DownstreamPathTemplate": "/api/users/baseinfo/{userId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 51929
+        }
+      ],
+      "UpstreamPathTemplate": "/users",
+      "UpstreamHttpMethod": [ "Get", "Patch" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "finbook",
+        "AllowedScopes": [ "user_api" ]
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/connect/{catchAll}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -25,18 +41,34 @@
           "Port": 51740
         }
       ],
-      "UpstreamPathTemplate": "/connect/token",
+      "UpstreamPathTemplate": "/connect/{catchAll}",
       "UpstreamHttpMethod": [ "Post" ]
     },
     {
       "DownstreamPathTemplate": "/api/Contacts",
-       "DownstreamHostAndPorts": [
+      "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
           "Port": 57794
         }
       ],
       "UpstreamPathTemplate": "/Contacts",
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "finbook",
+        "AllowedScopes": [ "contact_api" ]
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/.well-known/{catchAll}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 51740
+        }
+      ],
+      "UpstreamPathTemplate": "/.well-known/{catchAll}",
       "UpstreamHttpMethod": [ "Get" ]
     },
     {
@@ -61,7 +93,7 @@
         }
       ],
       "UpstreamPathTemplate": "/Contacts/apply-requests",
-      "UpstreamHttpMethod": [ "Get","Put","Post" ]
+      "UpstreamHttpMethod": [ "Get", "Put", "Post" ]
     }
 
   ],

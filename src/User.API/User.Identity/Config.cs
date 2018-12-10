@@ -29,6 +29,7 @@ namespace User.Identity
                     AlwaysIncludeUserClaimsInIdToken=true,
                     AllowedScopes = new List<string>{
                         "gateway_api",
+                        "contact_api",
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.StandardScopes.OfflineAccess,
@@ -49,6 +50,8 @@ namespace User.Identity
                     AlwaysIncludeUserClaimsInIdToken=true,//将Claims加入到Token里面去
                     AllowedScopes = new List<string>{
                         "gateway_api",
+                        "contact_api",//将APIResource添加进来
+                        "user_api",
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.StandardScopes.OfflineAccess,
@@ -72,10 +75,11 @@ namespace User.Identity
             return new List<ApiResource>
             {
                 new ApiResource("gateway_api", "API Application"),
+                new ApiResource("contact_api","contact service"),
                 //new ApiResource("gateway_api","gateway service"),
                 new ApiResource("user_api","user service"),
-                new ApiResource("project_api","project service"),
-                new ApiResource("contact_api","contact service")
+                new ApiResource("project_api","project service")
+                
                // new ApiResource("user_api", "user service")
             };
         }
