@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Contact.API.Dtos;
 using DnsClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Resilience.Http;
-using User.API.Dtos;
 
 namespace Contact.API.Service
 {
@@ -35,31 +37,29 @@ namespace Contact.API.Service
 
             _userServiceUrl = $"http://{host.Replace(".", "")}:{port}";
         }
-        public Task<BaseUseInfo> GetBaseUseInfoAsync(int userId)
+        public async Task<UserIdentity> GetBaseUseInfoAsync(int userId)
         {
-            var form = new Dictionary<string, string> { { "phone", phone } };
-            var requestUrl = $"{_userServiceUrl}/api/users/check-or-create";
-
-            HttpResponseMessage response = null;
+            _logger.LogTrace($"Enter info GetBaseUseInfoAsync with userId { userId}");
             try
             {
-                response = await _httpClient.PostAsync(requestUrl, form);
+               var  response = await _httpClient.GetStringAsync(_userServiceUrl + "/api/users/baseinfo/" +userId);
+
+                if (string.IsNullOrEmpty(response))
+                {
+                    //var userId = await response.Content.ReadAsStringAsync();
+                    //int.TryParse(userId, out var intUserId);
+                    //return intUserId;
+                    var userInfo = JsonConvert.DeserializeObject<UserIdentity>(response);
+                    _logger.LogTrace($"Completed GetBaseUseInfoAsync with userId { userInfo.UserId}");
+                    return userInfo;
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError("CheckOrCreate 在重试之后失败" + ex.Message + ex.StackTrace);
+                _logger.LogError("GetBaseUseInfoAsync 在重试之后失败" + ex.Message + ex.StackTrace);
             }
 
-            if (response?.StatusCode == HttpStatusCode.OK)
-            {
-                //var userId = await response.Content.ReadAsStringAsync();
-                //int.TryParse(userId, out var intUserId);
-                //return intUserId;
-                var result = await response.Content.ReadAsStringAsync();
-                var userInfo = JsonConvert.DeserializeObject<UserInfo>(result);
-
-                return userInfo;
-            }
+           
 
             return null;
         }

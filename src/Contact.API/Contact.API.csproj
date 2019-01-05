@@ -13,4 +13,8 @@
     <PackageReference Include="MongoDB.Driver" Version="2.7.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\User.API\Resilience.Http\Resilience.Http.csproj" />
+  </ItemGroup>
+
 </Project>

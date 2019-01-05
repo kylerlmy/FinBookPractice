@@ -18,14 +18,14 @@ namespace Contact.API.Data
         /// <param name="userinfo"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<bool> UpdateContactInfoAsync(BaseUseInfo userinfo, CancellationToken cancellationToken);
+        Task<bool> UpdateContactInfoAsync(UserIdentity userinfo, CancellationToken cancellationToken);
         /// <summary>
         /// 添加联系人信息
         /// </summary>
         /// <param name="contact"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<bool> AddContactAsync(int userId, BaseUseInfo contact, CancellationToken cancellationToken);
+        Task<bool> AddContactAsync(int userId, UserIdentity contact, CancellationToken cancellationToken);
 
         /// <summary>
         /// 获取联系人列表
