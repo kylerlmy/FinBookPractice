@@ -25,8 +25,8 @@
           "Port": 51929
         }
       ],
-      "UpstreamPathTemplate": "/users",
-      "UpstreamHttpMethod": [ "Get", "Patch" ],
+      "UpstreamPathTemplate": "/users/baseinfo/{userId}",
+      "UpstreamHttpMethod": [ "Get" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "finbook",
         "AllowedScopes": [ "user_api" ]
@@ -55,7 +55,6 @@
       "UpstreamPathTemplate": "/Contacts",
       "UpstreamHttpMethod": [ "Get" ],
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "finbook",
         "AllowedScopes": [ "contact_api" ]
       }
     },
@@ -93,7 +92,25 @@
         }
       ],
       "UpstreamPathTemplate": "/Contacts/apply-requests",
-      "UpstreamHttpMethod": [ "Get", "Put", "Post" ]
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": {
+        "AllowedScopes": [ "contact_api" ]
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/Contacts/apply-requests/{catchAll}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 57794
+        }
+      ],
+      "UpstreamPathTemplate": "/Contacts/apply-requests/{catchAll}",
+      "UpstreamHttpMethod": [ "Get", "Put", "Post" ],
+      "AuthenticationOptions": {
+        "AllowedScopes": [ "contact_api" ]
+      }
     }
 
   ],

@@ -44,7 +44,7 @@ namespace User.Identity
             .AddInMemoryIdentityResources(Config.GetIdentityResources());
 
 
-            //将配置文件中的内容进行注入
+            //将配置文件中的内容进行注入,服务发现配置
             services.Configure<Dtos.ServiceDiscoveryOptions>(Configuration.GetSection("ServiceDiscovery"));
 
             services.AddSingleton<IDnsQuery>(p =>

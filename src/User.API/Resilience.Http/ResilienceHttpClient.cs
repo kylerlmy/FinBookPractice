@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
+using System.Net;
 
 namespace Resilience.Http
 {
@@ -132,5 +133,47 @@ namespace Resilience.Http
                 requestMessage.Headers.Add("Authorization", new List<string>() { authorizationHeader });
             }
         }
+
+        public Task<HttpResponseMessage> PutAsync<T>(string uri, T item, string authorizationToken = null, string requestId = null, string authorizationMethod = "Bearer")
+        {
+            Func<HttpRequestMessage> func = () => CreateHttpRequestMessage(HttpMethod.Post, uri, item);
+            return DoPostAsync(HttpMethod.Put, uri, func, authorizationToken, requestId, authorizationMethod);
+        }
+
+        public Task<string> GetStringAsync(string uri, string authorizationToken = null, string authorizationMethod = "Bearer")
+        {
+            var origin = GetOriginFromUri(uri);
+
+            return HttpInvoker(origin, async () =>
+            {
+                var requestMessage = new HttpRequestMessage(HttpMethod.Get, uri);
+
+                SetAuthorizationHeader(requestMessage);
+
+                if (authorizationToken != null)
+                {
+                    requestMessage.Headers.Authorization = new AuthenticationHeaderValue(authorizationMethod, authorizationToken);
+                }
+
+                var response = await _httpClient.SendAsync(requestMessage);
+
+                // raise exception if HttpResponseCode 500 
+                // needed for circuit breaker to track fails
+
+                if (response.StatusCode == HttpStatusCode.InternalServerError)
+                {
+                    throw new HttpRequestException();
+                }
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return null;
+                }
+
+                return await response.Content.ReadAsStringAsync();
+            });
+        }
+
+
     }
 }

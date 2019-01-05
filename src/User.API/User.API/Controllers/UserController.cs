@@ -81,6 +81,31 @@ namespace User.API.Controllers {
             return Json (user);
         }
 
+
+        [Route("baseinfo/{userId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetBaseInfo(int userId)
+        {
+            //TBD 检查用户是否好友关系
+            var user = await _userContext.Users
+                //.AsNoTracking() //不再进行状态跟踪，节省EF开销
+                //.Include(u => u.Properties)
+                .SingleOrDefaultAsync(u => u.Id == UserIdentity.UserId);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new
+            {
+                user.Id,
+                user.Name,
+                user.Company,
+                user.Title,
+                user.Avatar
+            });
+        }
         /// <summary>
         /// 检查或创建用户（当用户手机号不存在的时候创建用户）
         /// </summary>
