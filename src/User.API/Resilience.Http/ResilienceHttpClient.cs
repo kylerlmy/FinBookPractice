@@ -148,11 +148,13 @@ namespace Resilience.Http
             {
                 var requestMessage = new HttpRequestMessage(HttpMethod.Get, uri);
 
-                SetAuthorizationHeader(requestMessage);
+                
 
                 if (authorizationToken != null)
                 {
                     requestMessage.Headers.Authorization = new AuthenticationHeaderValue(authorizationMethod, authorizationToken);
+
+                    SetAuthorizationHeader(requestMessage);
                 }
 
                 var response = await _httpClient.SendAsync(requestMessage);

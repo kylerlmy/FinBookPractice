@@ -67,6 +67,7 @@ namespace Contact.API.Controllers
         [Route("apply-requests/{userId}")]
         public async Task<IActionResult> AddApplyRequest(int userId, CancellationToken cancellationToken)
         {
+            /*
             var userBaseInfo = await _userService.GetBaseUseInfoAsync(userId);
 
             if (userBaseInfo == null)
@@ -93,6 +94,29 @@ namespace Contact.API.Controllers
             }
 
             return Ok();
+
+    */
+
+            var result = await _contactApplyRequestRepository.AddRequestAsync(new ContactApplyRequest
+            {
+                UserId = userId,
+                ApplierId = UserIdentity.UserId,
+                Name = UserIdentity.Name,
+                Company = UserIdentity.Company,
+                ApplyTime = DateTime.Now,
+                Title = UserIdentity.Title,
+                Avatar = UserIdentity.Avatar
+
+            }, cancellationToken);
+
+            if (!result)
+            {
+                //log tdb
+                return BadRequest();
+            }
+
+            return Ok();
+
 
         }
         /// <summary>

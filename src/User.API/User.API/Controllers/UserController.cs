@@ -99,7 +99,7 @@ namespace User.API.Controllers {
 
             return Ok(new
             {
-                user.Id,
+                userId=user.Id,
                 user.Name,
                 user.Company,
                 user.Title,

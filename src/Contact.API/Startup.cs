@@ -58,7 +58,7 @@ namespace Contact.API
                     options.RequireHttpsMetadata = false;
                     options.Audience = "contact_api";
                     options.Authority = "http://localhost";
-                    options.SaveToken = true;
+                    //options.SaveToken = true;
 
                 });
             #endregion
@@ -77,6 +77,7 @@ namespace Contact.API
 
             #region polly register
 
+            services.AddHttpContextAccessor();//不添加，以下代码会抛出异常
             //注册全局单例ResilientHttpClientFactory
             services.AddSingleton(typeof(ResilientHttpClientFactory), sp =>
             {
@@ -86,6 +87,7 @@ namespace Contact.API
                 var exceptionCountAllowedBeforeBreaking = 5;
                 return new ResilientHttpClientFactory(logger, httpContextAccessor, retryCount, exceptionCountAllowedBeforeBreaking);
             });
+
             //注册全局实例IHttpClient
             services.AddSingleton<IHttpClient>(sp =>
             {
@@ -122,6 +124,7 @@ namespace Contact.API
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseAuthentication();
             app.UseMvc();
         }
     }

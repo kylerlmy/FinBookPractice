@@ -42,7 +42,8 @@ namespace Contact.API.Service
             _logger.LogTrace($"Enter info GetBaseUseInfoAsync with userId { userId}");
             try
             {
-               var  response = await _httpClient.GetStringAsync(_userServiceUrl + "/api/users/baseinfo/" +userId);
+                var uri = $"{_userServiceUrl}/api/users/baseinfo/{userId}";
+               var  response = await _httpClient.GetStringAsync(uri);
 
                 if (string.IsNullOrEmpty(response))
                 {
