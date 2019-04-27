@@ -34,7 +34,7 @@ namespace Contact.API.Data
             }
         }
 
-
+        //Mongo中，每个Database会有多个Collections，每个Collections相当于关系数据库中的一个表，数据都存储到Collections中
 
         /// <summary>
         /// 用户通讯录
@@ -52,7 +52,7 @@ namespace Contact.API.Data
         /// <summary>
         /// 好友的申请请求
         /// </summary>
-        public IMongoCollection<ContactApplyRequest> ContactApplyRequests
+        public IMongoCollection<ContactApplyRequest> ContactApplyRequests 
         {
             get
             {

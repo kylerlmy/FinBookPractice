@@ -9,7 +9,7 @@ namespace User.API.Controllers {
     public class BaseController : Controller {
         protected UserIdentity UserIdentity {
             get {
-                var identity = new UserIdentity () { UserId = 1 };
+                var identity = new UserIdentity () { UserId = 1 ,Name="kyle"};
 
                 var claims = User?.Claims;
 

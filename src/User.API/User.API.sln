@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resilience", "Resilience", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Resilience.Http", "Resilience.Http\Resilience.Http.csproj", "{A5CEA3F4-167C-437D-8AC6-D9CBDB42D617}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contact.API", "..\Contact.API\Contact.API.csproj", "{773B2CF4-BCE6-4DDD-B6A3-103DE9AC1A36}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contact.API", "..\Contact.API\Contact.API.csproj", "{773B2CF4-BCE6-4DDD-B6A3-103DE9AC1A36}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

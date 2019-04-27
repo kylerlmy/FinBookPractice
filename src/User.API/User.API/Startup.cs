@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Threading.Tasks;
 using Consul;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -18,6 +16,7 @@ using Microsoft.Extensions.Options;
 using User.API.Data;
 using User.API.Dtos;
 using User.API.Filters;
+
 
 namespace User.API
 {
@@ -38,6 +37,7 @@ namespace User.API
                 options.UseMySql(Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            #region --服务发现--
             //将配置文件中的内容进行注入
             services.Configure<Dtos.ServiceDiscoveryOptions>(Configuration.GetSection("ServiceDiscovery"));
 
@@ -52,6 +52,10 @@ namespace User.API
                 }
             }));
 
+            #endregion --服务发现--
+
+
+            #region  --身份认证--
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -62,12 +66,43 @@ namespace User.API
 
                 });
 
+            #endregion -- 身份认证--
+
 
             services.AddMvc(options =>
             {
                 options.Filters.Add(typeof(GlobalExceptionFilter));
             })
            .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            try
+            {
+                services.AddCap(options =>
+                {
+
+                    options.UseEntityFramework<UserContext>()
+                      .UseRabbitMQ("192.168.1.110")
+                      .UseDashboard();
+
+                    //Register to Consul
+                    options.UseDiscovery(d =>
+                        {
+                            d.DiscoveryServerHostName = "localhost";
+                            d.DiscoveryServerPort = 8500;
+                            d.CurrentNodeHostName = "localhost";
+                            d.CurrentNodePort = 5800;
+                            d.NodeId = 1;
+                            d.NodeName = "CAP No.1 Node";
+                        });
+                });
+
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -83,6 +118,7 @@ namespace User.API
                 app.UseDeveloperExceptionPage();
             }
 
+            #region --服务发现注册--
             //启动的时候注册服务
             applicationLifetime.ApplicationStarted.Register(() =>
             {
@@ -95,12 +131,19 @@ namespace User.API
                 DeRegisterService(app, serviceOptions, consul);
             });
 
+            #endregion --服务发现注册--
+
+            // app.UseCap();//2.3版本之后不再需要注册
+            //身份认证管道配置
             app.UseAuthentication();
 
             app.UseMvc();
+
+            //执行数据库迁移
             UserContextSeed.SeedAsync(app, loggerFactory).Wait();
         }
 
+        #region --服务发现注册--
         private void RegisterService(IApplicationBuilder app,
             IOptions<ServiceDiscoveryOptions> serviceOptions,
             IConsulClient consul)
@@ -115,7 +158,7 @@ namespace User.API
             foreach (var address in addresses)
             {
                 var serviceId = $"{serviceOptions.Value.ServiceName}_{address.Host}:{address.Port}";
-
+                //健康检查
                 var httpCheck = new AgentServiceCheck()
                 {
                     DeregisterCriticalServiceAfter = TimeSpan.FromMinutes(1),
@@ -154,5 +197,8 @@ namespace User.API
             }
 
         }
+
+        #endregion --服务发现注册--
+
     }
 }

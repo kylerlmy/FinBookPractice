@@ -18,7 +18,7 @@ namespace Gateway.API
         public void ConfigureServices(IServiceCollection services)
         {
             var authenticationProviderKey = "finbook";
-
+            //配置对网关的请求交由Identity处理请求的认证与授权
             services.AddAuthentication()
             .AddIdentityServerAuthentication(authenticationProviderKey, options =>
              {
@@ -26,7 +26,7 @@ namespace Gateway.API
                  options.ApiName = "gateway_api";
                  options.SupportedTokens = SupportedTokens.Both;
                  options.ApiSecret = "secret";
-                 options.RequireHttpsMetadata = false;
+                 options.RequireHttpsMetadata = false;//设置使用http；默认为true，即强制使用https
              });
             services.AddOcelot();
         }

@@ -1,3 +1,4 @@
+using DotNetCore.CAP;
 using FluentAssertions;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,7 @@ using Xunit;
 namespace User.API.UnitTests
 {
     public class UserControllerUnitTests
-    { 
+    {
         private UserContext GetUserContext()
         {
             var options = new DbContextOptionsBuilder<UserContext>()
@@ -26,7 +27,7 @@ namespace User.API.UnitTests
             var userContext = new UserContext(options);
 
             userContext.Users.Add(new AppUser { Id = 1, Name = "kyle" });
-           userContext.UserProperties.Add(new UserProperty { Key = "fin_Company", Value = "百度", Text = "百度" });
+            userContext.UserProperties.Add(new UserProperty { Key = "fin_Company", Value = "百度", Text = "百度" });
 
             userContext.SaveChanges();
 
@@ -38,9 +39,10 @@ namespace User.API.UnitTests
             var context = GetUserContext();
 
             var loggerMock = new Mock<ILogger<UserController>>();
+            var publish = new Mock<ICapPublisher>().Object;
             var logger = loggerMock.Object;
 
-            return new UserController(context, logger);
+            return new UserController(context, publish, logger);
         }
 
         private (UserController userController, UserContext userContext) GetUserController()
@@ -48,9 +50,11 @@ namespace User.API.UnitTests
             var context = GetUserContext();
 
             var loggerMock = new Mock<ILogger<UserController>>();
+            var publish = new Mock<ICapPublisher>().Object;
+
             var logger = loggerMock.Object;
 
-            return (userController: new UserController(context, logger), userContext: context);
+            return (userController: new UserController(context, publish, logger), userContext: context);
         }
 
 

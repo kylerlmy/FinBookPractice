@@ -6,7 +6,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 51929
+          "Port": 51929 //User.API
         }
       ],
       "UpstreamPathTemplate": "/users",
@@ -22,7 +22,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 51929
+          "Port": 51929//User.API
         }
       ],
       "UpstreamPathTemplate": "/users/baseinfo/{userId}",
@@ -38,7 +38,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 51740
+          "Port": 51740 //Identity
         }
       ],
       "UpstreamPathTemplate": "/connect/{catchAll}",
@@ -46,10 +46,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/Contacts",
+      "DownstreamScheme": "http",//改行代码不指定，将导致500，无法处理请求，也无响应
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 57794
+          "Port": 57794 //Contact
         }
       ],
       "UpstreamPathTemplate": "/Contacts",
@@ -65,7 +66,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 51740
+          "Port": 51740//Identity
         }
       ],
       "UpstreamPathTemplate": "/.well-known/{catchAll}",
@@ -77,14 +78,14 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 57794
+          "Port": 57794 //Contact
         }
       ],
       "UpstreamPathTemplate": "/Contacts/tag",
       "UpstreamHttpMethod": [ "Put" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "finbook",
-        "AllowedScopes": [ "contact_api" ]
+        "AllowedScopes": [ "contact_api" ]//通过网关进行认证授权，必须在Scopes中添加contact_api才能访问Contact服务
       }
 
     },
@@ -94,7 +95,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 57794
+          "Port": 57794//Contact
         }
       ],
       "UpstreamPathTemplate": "/Contacts/apply-requests",
@@ -110,11 +111,11 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 57794
+          "Port": 57794 //Contact
         }
       ],
       "UpstreamPathTemplate": "/Contacts/apply-requests/{catchAll}",
-      "UpstreamHttpMethod": [ "Put", "Post" ],
+      "UpstreamHttpMethod": [ "Put", "Post" ],//将Get移除，由于不指定userId的情况下，无法请求到数据
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "finbook",
         "AllowedScopes": [ "contact_api" ]

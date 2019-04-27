@@ -15,7 +15,7 @@ namespace Contact.API.Controllers
                 var identity = new UserIdentity();
 
                 var claims = User.Claims;
-
+                //获取 Claims
                 if (claims.Any())
                 {
                     identity.UserId = Convert.ToInt32(claims.FirstOrDefault(c => c.Type == "sub").Value);
