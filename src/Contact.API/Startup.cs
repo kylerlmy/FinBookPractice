@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using Contact.API.Data;
 using Contact.API.Dtos;
 using Contact.API.Infrastructure;
+using Contact.API.IntegrationEvents.EventHanding;
 using Contact.API.Models;
 using Contact.API.Service;
 using DnsClient;
+using DotNetCore.CAP;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -97,6 +99,11 @@ namespace Contact.API
             #endregion
 
             #region Mongo config
+
+            services.AddScoped<IContactContext, ContactContext>();
+            services.AddScoped<IContactRepository, MongoContactRepository>();
+            services.AddScoped<IContactApplyRequestRepository, MongoContactApplyRequestRepository>();
+
             services.Configure<Settings>(
                 options =>
                 {
@@ -104,16 +111,38 @@ namespace Contact.API
                     options.Database = Configuration.GetSection("MongoDb:Database").Value;
                 });
 
-            services.AddTransient<IContactContext, ContactContext>();
-            services.AddTransient<IContactRepository, MongoContactRepository>();
-            services.AddTransient<IContactApplyRequestRepository, MongoContactApplyRequestRepository>();
 
             #endregion
 
 
-            services.AddTransient<IUserService, UserService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<UserProfileChangedEventHandler>();
+
+
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddCap(x =>
+            {
+
+                x.UseMySql("server=192.168.1.110;port=3306;database=beta_contact;userid=kyle;password=Netkyle");
+                x.UseRabbitMQ("192.168.1.110");
+                x.UseDashboard();
+
+                //Register to Consul
+                x.UseDiscovery(d =>
+                {
+                    d.DiscoveryServerHostName = "localhost";
+                    d.DiscoveryServerPort = 8500;
+                    d.CurrentNodeHostName = "localhost";
+                    d.CurrentNodePort = 5801;
+                    d.NodeId = 2;
+                    d.NodeName = "CAP No.2 Node";
+                });
+
+
+
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

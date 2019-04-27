@@ -45,7 +45,7 @@ namespace Contact.API.Service
                 var uri = $"{_userServiceUrl}/api/users/baseinfo/{userId}";
                var  response = await _httpClient.GetStringAsync(uri);
 
-                if (string.IsNullOrEmpty(response))
+                if (!string.IsNullOrEmpty(response))
                 {
                     //var userId = await response.Content.ReadAsStringAsync();
                     //int.TryParse(userId, out var intUserId);

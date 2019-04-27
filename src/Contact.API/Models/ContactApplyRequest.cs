@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Contact.API.Models
 {
-    [BsonIgnoreExtraElements]
+    [BsonIgnoreExtraElements]//使用特性，标识只读
     public class ContactApplyRequest
     {
         /// <summary>

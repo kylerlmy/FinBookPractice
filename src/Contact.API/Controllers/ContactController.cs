@@ -103,6 +103,7 @@ namespace Contact.API.Controllers
                 ApplierId = UserIdentity.UserId,
                 Name = UserIdentity.Name,
                 Company = UserIdentity.Company,
+                HandelTime = DateTime.Now,
                 ApplyTime = DateTime.Now,
                 Title = UserIdentity.Title,
                 Avatar = UserIdentity.Avatar
@@ -124,7 +125,7 @@ namespace Contact.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut]
-        [Route("apply-requests")]
+        [Route("apply-requests/{applierId}")]//注意此处的applierid不要写成userid，否则接受到的applierId的值将是0
         public async Task<IActionResult> ApprovalApplyRequest(int applierId, CancellationToken cancellationToken)
         {
             var result = await _contactApplyRequestRepository.ApprovalAsync(UserIdentity.UserId, applierId, cancellationToken);

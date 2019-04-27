@@ -23,7 +23,7 @@ namespace Contact.API.Data
 
             if ((await _contactContext.ContactApplyRequests.CountDocumentsAsync(filter, cancellationToken: cancellationToken)) > 0)
             {
-                var update = Builders<ContactApplyRequest>.Update.Set(r => r.ApplyTime, DateTime.Now);
+                var update = Builders<ContactApplyRequest>.Update.Set(r => r.ApplyTime, DateTime.Now).Set(c => c.HandelTime, DateTime.Now);
                 var result = await _contactContext.ContactApplyRequests.UpdateOneAsync(filter, update, null, cancellationToken);
 
                 return result.MatchedCount == result.ModifiedCount && result.MatchedCount == 1;
@@ -33,7 +33,6 @@ namespace Contact.API.Data
             var options = new UpdateOptions { IsUpsert = true };
             _contactContext.ContactApplyRequests.UpdateOne(filter, update, options, cancellationToken);
 #endif
-
             await _contactContext.ContactApplyRequests.InsertOneAsync(request, null, cancellationToken);
 
             return true;
@@ -45,8 +44,8 @@ namespace Contact.API.Data
 
 
             var update = Builders<ContactApplyRequest>.Update
-                .Set(r => r.Approvaled,1)
-                .Set(r=>r.HandelTime,DateTime.Now);
+                .Set(r => r.Approvaled, 1)
+                .Set(r => r.HandelTime, DateTime.Now);
             var result = await _contactContext.ContactApplyRequests.UpdateOneAsync(filter, update, null, cancellationToken);
 
             return result.MatchedCount == result.ModifiedCount && result.MatchedCount == 1;
@@ -54,7 +53,8 @@ namespace Contact.API.Data
 
         public async Task<List<ContactApplyRequest>> GetRequestListAsync(int userId, CancellationToken cancellationToken)
         {
-            return (await _contactContext.ContactApplyRequests.FindAsync(c => c.UserId == userId)).ToList(cancellationToken);
+           var result= (await _contactContext.ContactApplyRequests.FindAsync(c => c.UserId == userId)).ToList(cancellationToken);
+            return result;
         }
     }
 }
