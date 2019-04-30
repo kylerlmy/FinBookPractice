@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Project.API.Applications.Commands
 {
-    public class CreateOrderCommand : IRequest<Domain.AggregatesModel.Project>
+    public class CreateProjectCommand : IRequest<Domain.AggregatesModel.Project>
     {
-        public Domain.AggregatesModel.Project Project { get; st; }
+        public Domain.AggregatesModel.Project Project { get; set; }
     }
 }

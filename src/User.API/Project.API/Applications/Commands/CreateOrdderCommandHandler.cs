@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Project.API.Applications.Commands
 {
-    public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Domain.AggregatesModel.Project>
+    public class CreateOrderCommandHandler : IRequestHandler<CreateProjectCommand, Domain.AggregatesModel.Project>
     {
         private IProjectRepository _projectRepository;
 
@@ -17,7 +17,7 @@ namespace Project.API.Applications.Commands
             _projectRepository = projectRepository;
 
         }
-        public async Task<Domain.AggregatesModel.Project> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+        public async Task<Domain.AggregatesModel.Project> Handle(CreateProjectCommand request, CancellationToken cancellationToken)
         {
            await _projectRepository.AddAsync(request.Project);
 
