@@ -1,11 +1,12 @@
 ﻿using Project.Domain.SeedWork;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Project.Domain.AggregatesModel
 {
-    public class Project:Entity,IAggregateRoot
+    public class Project : Entity, IAggregateRoot
     {
 
         /// <summary>
@@ -160,7 +161,7 @@ namespace Project.Domain.AggregatesModel
 
         public DateTime CreateTime { get; set; }
 
-        public Project CloneProject(Project source = null)
+        private Project CloneProject(Project source = null)
         {
             if (source == null)
                 source = this;
@@ -207,7 +208,7 @@ namespace Project.Domain.AggregatesModel
 
             foreach (var item in source.Properties)
             {
-                newProject.Properties.Add(new ProjectProperty(item.Key,item.Text,item.Value));
+                newProject.Properties.Add(new ProjectProperty(item.Key, item.Text, item.Value));
             }
             return newProject;
         }
@@ -233,5 +234,35 @@ namespace Project.Domain.AggregatesModel
 
             return newProject;
         }
+
+
+        public void AddViewer(int userId, string userName, string avatar)
+        {
+            var viewer = new ProjectViewer
+            {
+                UserId = userId,
+                UserName = userName,
+                Avatar = avatar,
+                CreateTime = DateTime.Now
+            };
+
+
+            if (!Viewers.Any(v => v.UserId == userId))
+            {
+                Viewers.Add(viewer);
+            }
+
+        }
+
+        public void AddContributor(ProjectContributor contributor)
+        {
+            if (!Contributors.Any(v => v.UserId == contributor.UserId))
+            {
+                Contributors.Add(contributor);
+            }
+        }
+
+
+
     }
 }
