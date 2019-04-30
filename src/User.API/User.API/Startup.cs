@@ -100,7 +100,7 @@ namespace User.API
             catch (Exception ex)
             {
 
-                throw;
+                throw ex;
             }
 
         }
