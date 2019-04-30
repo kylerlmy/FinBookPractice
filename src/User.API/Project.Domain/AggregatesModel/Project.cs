@@ -1,4 +1,5 @@
-﻿using Project.Domain.SeedWork;
+﻿using Project.Domain.Events;
+using Project.Domain.SeedWork;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,14 @@ namespace Project.Domain.AggregatesModel
 {
     public class Project : Entity, IAggregateRoot
     {
+
+        public Project()
+        {
+            Viewers = new List<ProjectViewer>();
+            Contributors = new List<ProjectContributor>();
+
+            AddDomainEvent(new ProjectCreatedEvent { Project = this });
+        }
 
         /// <summary>
         /// 用户ID
@@ -250,6 +259,7 @@ namespace Project.Domain.AggregatesModel
             if (!Viewers.Any(v => v.UserId == userId))
             {
                 Viewers.Add(viewer);
+                AddDomainEvent(new ProjectViewedEvent { Viewer = viewer });
             }
 
         }
@@ -259,6 +269,8 @@ namespace Project.Domain.AggregatesModel
             if (!Contributors.Any(v => v.UserId == contributor.UserId))
             {
                 Contributors.Add(contributor);
+
+                AddDomainEvent(new ProjectJoinedEvent { Contributor = contributor });
             }
         }
 
