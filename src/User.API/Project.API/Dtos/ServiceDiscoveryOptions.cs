@@ -7,7 +7,7 @@ namespace Project.API.Dtos
 {
     public class ServiceDiscoveryOptions
     {
-        public string UserServiceName { get; set; }
+        public string ServiceName { get; set; }
 
         public ConsulOptions Consul { get; set; }
     }

@@ -52,6 +52,7 @@ namespace User.Identity
                         "gateway_api",
                         "contact_api",//将APIResource添加进来
                         "user_api",
+                        "project_api",
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.StandardScopes.OfflineAccess,

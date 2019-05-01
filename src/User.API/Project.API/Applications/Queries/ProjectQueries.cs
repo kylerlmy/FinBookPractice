@@ -63,7 +63,7 @@ namespace Project.API.Applications.Queries
                                 Projects INNER JOIN ProjectVisibleRules
                                 ON Projects.Id=ProjectVisibleRules.ProjectId
                                 WHERE Projects.Id=@projectId ";
-            //AND Projects.UserId=@userId";
+                                //AND Projects.UserId=@userId";
 
 
             using (var conn = new MySqlConnection(_connectionString))

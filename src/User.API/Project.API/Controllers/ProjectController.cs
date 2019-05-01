@@ -104,9 +104,9 @@ namespace Project.API.Controllers
         [HttpPut]
         [Route("join/{projectId}")]
 
-        public async Task<IActionResult> JoinProject([FromBody] ProjectContributor contributor)
+        public async Task<IActionResult> JoinProject(int projectId,[FromBody] ProjectContributor contributor)
         {
-            if (await _recommendService.IsProjectRecommend(contributor.ProjectId, UserIdentity.UserId))
+            if (await _recommendService.IsProjectRecommend(projectId, UserIdentity.UserId))
             {
                 return BadRequest("没有查看项目的权限");
             }
