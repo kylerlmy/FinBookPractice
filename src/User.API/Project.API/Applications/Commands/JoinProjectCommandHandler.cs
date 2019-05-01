@@ -27,7 +27,7 @@ namespace Project.API.Applications.Commands
 
             project.AddContributor(request.Contributor);
 
-            await _projectRepository.UnitOfWork.SaveChangesAsync();
+            await _projectRepository.UnitOfWork.SaveEntitiesAsync();
         }
     }
 }

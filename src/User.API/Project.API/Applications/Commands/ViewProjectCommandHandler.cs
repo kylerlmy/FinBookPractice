@@ -29,7 +29,7 @@ namespace Project.API.Applications.Commands
 
             project.AddViewer(request.UserId, request.UserName, request.Avatar);
 
-            await _projectRepository.UnitOfWork.SaveChangesAsync();
+            await _projectRepository.UnitOfWork.SaveEntitiesAsync();
         }
     }
 }
