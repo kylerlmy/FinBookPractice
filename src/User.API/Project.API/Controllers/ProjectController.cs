@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Project.API.Applications.Commands;
@@ -73,6 +74,12 @@ namespace Project.API.Controllers
         [Route("")]
         public async Task<IActionResult> CreateProject([FromBody]Domain.AggregatesModel.Project project)
         {
+
+            if (project == null)
+                throw new ArgumentNullException(nameof(project));
+
+            project.UserId = project.UserId;
+
             var command = new CreateProjectCommand { Project = project };
             var projectResponse = await _mediator.Send(command);
 
@@ -104,7 +111,7 @@ namespace Project.API.Controllers
         [HttpPut]
         [Route("join/{projectId}")]
 
-        public async Task<IActionResult> JoinProject(int projectId,[FromBody] ProjectContributor contributor)
+        public async Task<IActionResult> JoinProject(int projectId, [FromBody] ProjectContributor contributor)
         {
             if (await _recommendService.IsProjectRecommend(projectId, UserIdentity.UserId))
             {

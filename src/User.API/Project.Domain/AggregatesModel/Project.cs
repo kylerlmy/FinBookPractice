@@ -259,7 +259,7 @@ namespace Project.Domain.AggregatesModel
             if (!Viewers.Any(v => v.UserId == userId))
             {
                 Viewers.Add(viewer);
-                AddDomainEvent(new ProjectViewedEvent { Viewer = viewer });
+                AddDomainEvent(new ProjectViewedEvent { Viewer = viewer, Company = Company, Introduction = Introduction });
             }
 
         }
@@ -270,7 +270,7 @@ namespace Project.Domain.AggregatesModel
             {
                 Contributors.Add(contributor);
 
-                AddDomainEvent(new ProjectJoinedEvent { Contributor = contributor });
+                AddDomainEvent(new ProjectJoinedEvent { Contributor = contributor, Avatar = Avatar, Company = Company, Introduction = Introduction });
             }
         }
 

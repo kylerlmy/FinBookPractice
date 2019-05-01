@@ -27,6 +27,10 @@ namespace Project.API.Applications.Commands
                 throw new ProjectDomainException($"project not found:{request.ProjectId}");
             }
 
+
+            if (project.UserId == request.UserId)
+                throw new ProjectDomainException($"you can not view own project");
+
             project.AddViewer(request.UserId, request.UserName, request.Avatar);
 
             await _projectRepository.UnitOfWork.SaveEntitiesAsync();

@@ -13,7 +13,9 @@ using Microsoft.Extensions.Options;
 using Project.API.Applications.Queries;
 using Project.API.Applications.Service;
 using Project.API.Dtos;
+using Project.Domain.AggregatesModel;
 using Project.Infrastructure;
+using Project.Infrastructure.Repositories;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -76,11 +78,43 @@ namespace Project.API
             #endregion -- 身份认证--
 
 
+            //services.AddScoped<IRecommendService, TestRecommendService>()
+            //    .AddScoped<IProjectQueries, ProjectQueries>();
+            //Unable to resolve service for type "System.String" while attampting to active "Project.API.Applications.Queries.ProjectQueries"
+
             services.AddScoped<IRecommendService, TestRecommendService>()
-                .AddScoped<IProjectQueries, ProjectQueries>();
+                .AddScoped<IProjectRepository, ProjectRepository>(sp =>
+                {
+                    var context = sp.GetRequiredService<ProjectContext>();
+                    return new ProjectRepository(context);
+                })
+               .AddScoped<IProjectQueries, ProjectQueries>(sp =>
+               {
+                   return new ProjectQueries(Configuration.GetConnectionString("DefaultConnection"));
+               }
+                );
 
             services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddCap(options =>
+            {
+
+                options.UseEntityFramework<ProjectContext>()
+                  .UseRabbitMQ("192.168.1.110")
+                  .UseDashboard();
+
+                //Register to Consul
+                options.UseDiscovery(d =>
+                {
+                    d.DiscoveryServerHostName = "localhost";
+                    d.DiscoveryServerPort = 8500;
+                    d.CurrentNodeHostName = "localhost";
+                    d.CurrentNodePort = 5800;
+                    d.NodeId = 1;
+                    d.NodeName = "CAP No.30 Node";
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

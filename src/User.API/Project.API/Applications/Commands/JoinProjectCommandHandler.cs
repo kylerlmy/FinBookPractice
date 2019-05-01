@@ -25,6 +25,9 @@ namespace Project.API.Applications.Commands
                 throw new ProjectDomainException($"project not found:{request.Contributor.ProjectId}");
             }
 
+            if (project.UserId == request.Contributor.UserId)
+                throw new ProjectDomainException($"you can not join own project");
+
             project.AddContributor(request.Contributor);
 
             await _projectRepository.UnitOfWork.SaveEntitiesAsync();
