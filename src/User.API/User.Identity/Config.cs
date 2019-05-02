@@ -53,6 +53,7 @@ namespace User.Identity
                         "contact_api",//将APIResource添加进来
                         "user_api",
                         "project_api",
+                        "recommend_api",
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.StandardScopes.OfflineAccess,
@@ -79,7 +80,8 @@ namespace User.Identity
                 new ApiResource("contact_api","contact service"),
                 //new ApiResource("gateway_api","gateway service"),
                 new ApiResource("user_api","user service"),
-                new ApiResource("project_api","project service")
+                new ApiResource("project_api","project service"),
+                new ApiResource("recommend_api","recommend service")
                 
                // new ApiResource("user_api", "user service")
             };

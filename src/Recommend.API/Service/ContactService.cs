@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DnsClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Recommend.API.Dtos;
 using Resilience.Http;
 
@@ -36,9 +37,28 @@ namespace Recommend.API.Service
 
 
         }
-        public Task<List<Contact>> GetContactsByUserId(int userId)
+        public async Task<List<Contact>> GetContactsByUserId(int userId)
         {
-            throw new NotImplementedException();
+            _logger.LogTrace($"Enter info GetContactsByUserId with userId { userId}");
+            try
+            {
+                var uri = $"{_contactServiceUrl}/api/contacts/{userId}";
+                var response = await _httpClient.GetStringAsync(uri);
+
+                if (!string.IsNullOrEmpty(response))
+                {
+                    var userInfo = JsonConvert.DeserializeObject<List<Contact>>(response);
+                    _logger.LogTrace($"Completed GetContactsByUserId with userId {userId}");
+                    return userInfo;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("GetContactsByUserId 在重试之后失败" + ex.Message + ex.StackTrace);
+                throw ex;
+            }
+
+            return null;
         }
     }
 }

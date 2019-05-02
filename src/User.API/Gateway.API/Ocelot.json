@@ -152,8 +152,23 @@
         "AuthenticationProviderKey": "finbook",
         "AllowedScopes": [ "project_api" ]
       }
+    },
+    {
+      "DownstreamPathTemplate": "/api/recommend",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 8624 //Recommend
+        }
+      ],
+      "UpstreamPathTemplate": "/recommend",
+      "UpstreamHttpMethod": [ "Get" ], 
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "finbook",
+        "AllowedScopes": [ "recommend_api" ]
+      }
     }
-
   ],
   "GlobalConfiguration": {
     "BaseUrl": "http://localhost"

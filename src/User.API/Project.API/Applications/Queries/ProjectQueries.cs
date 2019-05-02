@@ -1,5 +1,7 @@
 ﻿using Dapper;
+using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
+using Project.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +11,14 @@ namespace Project.API.Applications.Queries
 {
     public class ProjectQueries : IProjectQueries
     {
-        private readonly string _connectionString;
+        //private readonly string _connectionString;
 
-        public ProjectQueries(string connectString)
+        private ProjectContext _dbContext;
+
+        public ProjectQueries(ProjectContext dbContext)//string connectString,
         {
-            _connectionString = connectString;
+            //_connectionString = connectString;
+            _dbContext = dbContext;
         }
 
         public async Task<dynamic> GetProjectByUserId(int userId)
@@ -29,7 +34,8 @@ namespace Project.API.Applications.Queries
                                 FROM Projects
                                 WHERE Projects.UserId=@userId";
 
-            using (var conn = new MySqlConnection(_connectionString))
+            // using (var conn = new MySqlConnection(_connectionString))
+            using (var conn =_dbContext.Database.GetDbConnection())
             {
                 conn.Open();
                 var result = await conn.QueryAsync<dynamic>(sqlString, new { userId });
@@ -63,10 +69,11 @@ namespace Project.API.Applications.Queries
                                 Projects INNER JOIN ProjectVisibleRules
                                 ON Projects.Id=ProjectVisibleRules.ProjectId
                                 WHERE Projects.Id=@projectId ";
-                                //AND Projects.UserId=@userId";
+                              //AND Projects.UserId=@userId";
 
 
-            using (var conn = new MySqlConnection(_connectionString))
+            //using (var conn = new MySqlConnection(_connectionString)) //CAP.Mysql 与 EFCore.Myql 中的 mysqlconnector 冲突
+            using (var conn = _dbContext.Database.GetDbConnection())
             {
                 conn.Open();
                 var result = await conn.QueryAsync<dynamic>(sqlString, new { projectId });

@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
+using DotNetCore.CAP;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Project.API.Applications.Commands;
+using Project.API.Applications.DomainEventHandles;
+using Project.API.Applications.IntegrationEvents;
 using Project.API.Applications.Queries;
 using Project.API.Applications.Service;
 using Project.Domain.AggregatesModel;
+using Project.Domain.Events;
+using Project.Infrastructure;
 
 namespace Project.API.Controllers
 {
@@ -16,14 +21,20 @@ namespace Project.API.Controllers
         private IMediator _mediator;
         private IRecommendService _recommendService;
         private IProjectQueries _projectQueries;
+        private ProjectContext _projectContext;
+        private ICapPublisher _cabPublisher;
 
         public ProjectController(IMediator mediator,
             IRecommendService recommendService,
-            IProjectQueries projectQueries)
+            IProjectQueries projectQueries,
+            ProjectContext projectContext,
+            ICapPublisher cabPublisher)
         {
             _mediator = mediator;
             _recommendService = recommendService;
             _projectQueries = projectQueries;
+            _projectContext = projectContext;
+            _cabPublisher = cabPublisher;
         }
 
         [HttpGet]
@@ -81,7 +92,22 @@ namespace Project.API.Controllers
             project.UserId = project.UserId;
 
             var command = new CreateProjectCommand { Project = project };
-            var projectResponse = await _mediator.Send(command);
+            Domain.AggregatesModel.Project projectResponse = null;
+
+            using (var transaction = await _projectContext.Database.BeginTransactionAsync())
+            {
+                var eventHandler = new ProjectCreatedDomainEventHandler(_cabPublisher);
+                var createdEvent = new ProjectCreatedEvent() { Project = project };
+                //发布用户属性变更的消息
+                await eventHandler.Handle(createdEvent, new System.Threading.CancellationToken());
+
+                projectResponse = await _mediator.Send(command);
+
+                transaction.Commit();
+            }
+
+            if (projectResponse == null)
+                return BadRequest("创建项目失败");
 
             return Ok(projectResponse);
 

@@ -68,18 +68,6 @@ namespace Contact.API
                 });
             #endregion
 
-            #region consul and  Consul Service Disvovery
-
-            //将配置文件中的内容进行注入,服务发现配置
-            services.Configure<ServiceDiscoveryOptions>(Configuration.GetSection("ServiceDiscovery"));
-            services.AddSingleton<IDnsQuery>(p =>
-            {
-                var serviceConfiguration = p.GetRequiredService<IOptions<ServiceDiscoveryOptions>>().Value;
-                return new LookupClient(serviceConfiguration.Consul.DnsEndpoint.ToIPEndPoint());
-            });
-
-            #endregion
-
             #region polly register
 
             services.AddHttpContextAccessor();//不添加，以下代码会抛出异常
@@ -123,6 +111,31 @@ namespace Contact.API
 
 
 
+            #region --服务发现--
+            //将配置文件中的内容进行注入
+
+            services.Configure<ServiceDiscoveryOptions>(Configuration.GetSection("ServiceDiscovery"));
+            services.AddSingleton<IDnsQuery>(p =>
+            {
+                var serviceConfiguration = p.GetRequiredService<IOptions<ServiceDiscoveryOptions>>().Value;
+                return new LookupClient(serviceConfiguration.Consul.DnsEndpoint.ToIPEndPoint());
+            });
+
+            services.AddSingleton<IConsulClient>(p => new ConsulClient(cfg =>
+            {
+                var serviceConfiguration = p.GetRequiredService<IOptions<ServiceDiscoveryOptions>>().Value;
+
+                if (!string.IsNullOrEmpty(serviceConfiguration.Consul.HttpEndpoint))
+                {
+                    // if not configured, the client will use the default value "127.0.0.1:8500"
+                    cfg.Address = new Uri(serviceConfiguration.Consul.HttpEndpoint);
+                }
+            }));
+
+            #endregion --服务发现--
+
+
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddCap(x =>
@@ -138,13 +151,10 @@ namespace Contact.API
                     d.DiscoveryServerHostName = "localhost";
                     d.DiscoveryServerPort = 8500;
                     d.CurrentNodeHostName = "localhost";
-                    d.CurrentNodePort = 5801;
+                    d.CurrentNodePort = 57794;//注意该端口为改WebAPI的访问端口，不能随便定义，否则，在服务注册的时候出错
                     d.NodeId = 2;
-                    d.NodeName = "CAP No.2 Node";
+                    d.NodeName = "CAP Contact API Node";
                 });
-
-
-
             });
         }
 

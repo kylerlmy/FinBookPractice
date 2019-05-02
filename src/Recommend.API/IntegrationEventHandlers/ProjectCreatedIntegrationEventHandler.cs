@@ -14,35 +14,49 @@ namespace Recommend.API.IntegrationEventHandlers
     {
         private RecommendDbContext _context;
         private IUserService _userService;
+        private IContactService _contactService;
 
-        public ProjectCreatedIntegrationEventHandler(RecommendDbContext context, IUserService userService)
+        public ProjectCreatedIntegrationEventHandler(RecommendDbContext context, IUserService userService, IContactService contactService)
         {
             _context = context;
             _userService = userService;
+            _contactService = contactService;
         }
 
-        public async Task CreateRecommendFromProject(ProjectCreatedIntegrationEvent integrationEvent)
+        [CapSubscribe("finbook.projectapi.projectcreated")]
+        public async Task CreateRecommendFromProject(ProjectCreatedIntegrationEvent @event)
         {
-            var fromUser = await _userService.GetBaseUseInfoAsync(integrationEvent.UserId);
+            var fromUser = await _userService.GetBaseUseInfoAsync(@event.UserId);
+            var contacts = await _contactService.GetContactsByUserId(@event.UserId);
 
-            var @event = new ProjectRecommend
+            foreach (var contact in contacts)
             {
-                ProjectId = integrationEvent.ProjectId,
-                CreatedTime = integrationEvent.CreatedTime,
-                UserId = integrationEvent.UserId,
-                Company = integrationEvent.Company,
-                FinState = integrationEvent.FinState,
-                Introduction = integrationEvent.Introduction,
-                ProjectAvatar = integrationEvent.ProjectAvatar,
-                Tags = integrationEvent.Tags,
-                RecommendTime = DateTime.Now,
-                RecommendType = ERecommendType.Friend,
-                FromUserId = fromUser.UserId,
-                FromUserName = fromUser.Name,
-                FromUserAvatar = fromUser.Avatar,
-            };
 
-           _context.
+                var recommend = new ProjectRecommend
+                {
+                    ProjectId = @event.ProjectId,
+                    CreatedTime = @event.CreatedTime,
+                    Company = @event.Company,
+                    FinState = @event.FinState,
+                    Introduction = @event.Introduction,
+                    ProjectAvatar = @event.ProjectAvatar,
+                    Tags = @event.Tags,
+                    RecommendTime = DateTime.Now,
+                    RecommendType = ERecommendType.Friend,
+                    FromUserId = fromUser.UserId,
+                    FromUserName = fromUser.Name,
+                    FromUserAvatar = fromUser.Avatar,
+
+                    UserId = contact.UserId,
+
+                };
+
+                _context.Recommends.Add(recommend);
+            }
+
+
+
+            await _context.SaveChangesAsync();
 
         }
     }

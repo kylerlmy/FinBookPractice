@@ -14,6 +14,6 @@ namespace Recommend.API.Dtos
         /// <summary>
         /// 好友 Id
         /// </summary>
-        public int ContactId { get; set; }
+        //public int ContactId { get; set; }
     }
 }

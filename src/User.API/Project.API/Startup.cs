@@ -88,11 +88,12 @@ namespace Project.API
                     var context = sp.GetRequiredService<ProjectContext>();
                     return new ProjectRepository(context);
                 })
-               .AddScoped<IProjectQueries, ProjectQueries>(sp =>
-               {
-                   return new ProjectQueries(Configuration.GetConnectionString("DefaultConnection"));
-               }
-                );
+                .AddScoped<IProjectQueries, ProjectQueries>();
+               //.AddScoped<IProjectQueries, ProjectQueries>(sp =>
+               //{
+               //    return new ProjectQueries(Configuration.GetConnectionString("DefaultConnection"));
+               //}
+               // );
 
             services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
@@ -110,9 +111,9 @@ namespace Project.API
                     d.DiscoveryServerHostName = "localhost";
                     d.DiscoveryServerPort = 8500;
                     d.CurrentNodeHostName = "localhost";
-                    d.CurrentNodePort = 5800;
-                    d.NodeId = 1;
-                    d.NodeName = "CAP No.30 Node";
+                    d.CurrentNodePort = 52458;//注意该端口为改WebAPI的访问端口，不能随便定义，否则，在服务注册的时候出错
+                    d.NodeId = 4;
+                    d.NodeName = "CAP Project API Node";
                 });
             });
         }

@@ -27,12 +27,21 @@ namespace Contact.API.Controllers
             _userService = userService;
             _contactRepository = contactRepository;
         }
+
         [HttpGet]   
         [Route("")]
         public async Task<IActionResult> Get(CancellationToken cancellationToken)
         {
             return Ok(await _contactRepository.GetContactsAsync(UserIdentity.UserId, cancellationToken));
         }
+
+        [HttpGet]
+        [Route("{userId}")]
+        public async Task<IActionResult> Get(int userId,CancellationToken cancellationToken)
+        {
+            return Ok(await _contactRepository.GetContactsAsync(userId, cancellationToken));
+        }
+
         [HttpPut]
         [Route("tag")]
         public async Task<IActionResult> TagContact([FromBody]TagContactViewModel tagContactViewModel,CancellationToken cancellationToken)

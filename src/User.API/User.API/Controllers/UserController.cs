@@ -19,10 +19,9 @@ namespace User.API.Controllers
     public class UserController : BaseController //ControllerBase
     {
         private UserContext _userContext;
-
         private ILogger<UserController> _logger;
-
         private ICapPublisher _capPublish;
+
         public UserController(UserContext userContext, ICapPublisher capPublish, ILogger<UserController> logger)
         {
             _userContext = userContext;
