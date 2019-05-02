@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
+using Consul;
 using Contact.API.Data;
 using Contact.API.Dtos;
 using Contact.API.Infrastructure;
@@ -14,7 +15,9 @@ using DotNetCore.CAP;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -146,15 +149,93 @@ namespace Contact.API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app,
+            IHostingEnvironment env,
+            IApplicationLifetime applicationLifetime,
+            IOptions<ServiceDiscoveryOptions> serviceOptions,
+            IConsulClient consul)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
+            #region --服务发现注册--
+            //启动的时候注册服务
+            applicationLifetime.ApplicationStarted.Register(() =>
+            {
+                RegisterService(app, serviceOptions, consul);
+            });
+
+            //停止的时候移除服务
+            applicationLifetime.ApplicationStopped.Register(() =>
+            {
+                DeRegisterService(app, serviceOptions, consul);
+            });
+
+            #endregion --服务发现注册--
+
+
             app.UseAuthentication();
             app.UseMvc();
         }
+
+        #region --服务发现注册--
+        private void RegisterService(IApplicationBuilder app,
+            IOptions<ServiceDiscoveryOptions> serviceOptions,
+            IConsulClient consul)
+        {
+            //http://michaco.net/blog/ServiceDiscoveryAndHealthChecksInAspNetCoreWithConsul
+
+            var features = app.Properties["server.Features"] as FeatureCollection;
+            var addresses = features.Get<IServerAddressesFeature>()
+                .Addresses
+                .Select(p => new Uri(p));
+
+            foreach (var address in addresses)
+            {
+                var serviceId = $"{serviceOptions.Value.ContactServiceName}_{address.Host}:{address.Port}";
+                //健康检查
+                var httpCheck = new AgentServiceCheck()
+                {
+                    DeregisterCriticalServiceAfter = TimeSpan.FromMinutes(1),
+                    Interval = TimeSpan.FromSeconds(30),
+                    HTTP = new Uri(address, "HealthCheck").OriginalString
+                };
+
+                var registration = new AgentServiceRegistration()
+                {
+                    Checks = new[] { httpCheck },
+                    Address = address.Host,
+                    ID = serviceId,
+                    Name = serviceOptions.Value.ContactServiceName,
+                    Port = address.Port
+                };
+
+                consul.Agent.ServiceRegister(registration).GetAwaiter().GetResult();
+            }
+        }
+
+        private void DeRegisterService(IApplicationBuilder app,
+         IOptions<ServiceDiscoveryOptions> serviceOptions,
+            IConsulClient consul)
+        {
+            //http://michaco.net/blog/ServiceDiscoveryAndHealthChecksInAspNetCoreWithConsul
+
+            var features = app.Properties["server.Features"] as FeatureCollection;
+            var addresses = features.Get<IServerAddressesFeature>()
+                .Addresses
+                .Select(p => new Uri(p));
+
+            foreach (var address in addresses)
+            {
+                var serviceId = $"{serviceOptions.Value.ContactServiceName}_{address.Host}:{address.Port}";
+                consul.Agent.ServiceDeregister(serviceId).GetAwaiter().GetResult();
+            }
+
+        }
+
+        #endregion --服务发现注册--
+
     }
 }
