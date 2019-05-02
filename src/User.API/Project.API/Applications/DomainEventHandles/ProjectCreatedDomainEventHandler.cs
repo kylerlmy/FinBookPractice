@@ -23,7 +23,12 @@ namespace Project.API.Applications.DomainEventHandles
             {
                 ProjectId = notification.Project.Id,
                 CreatedTime = DateTime.Now,
-                UserId = notification.Project.UserId
+                UserId = notification.Project.UserId,
+                Company = notification.Project.Company,
+                FinState = notification.Project.FinStage,
+                Introduction = notification.Project.Introduction,
+                ProjectAvatar = notification.Project.Avatar,
+                Tags = notification.Project.Avatar,
             };
 
             await _capPublisher.PublishAsync("finbook.projectapi.projectcreated", @event, "ProjectCreated", cancellationToken);
