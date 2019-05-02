@@ -9,6 +9,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Polly" Version="5.8.0" />
+    <PackageReference Include="zipkin4net" Version="1.3.0" />
   </ItemGroup>
 
 </Project>

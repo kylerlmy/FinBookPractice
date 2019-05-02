@@ -32,7 +32,7 @@ namespace Contact.API.Infrastructure
             _exceptionCountAllowedBeforeBreaking = exceptionCountAllowedBeforeBreaking;
         }
         public ResilienceHttpClient GetResilienceHttpClient() =>
-            new ResilienceHttpClient(origin => CreatePolicies(origin), _logger, _httpContextAccessor);
+            new ResilienceHttpClient("contact_api", origin => CreatePolicies(origin), _logger, _httpContextAccessor);
 
 
         private Policy[] CreatePolicies(string origin)

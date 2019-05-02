@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using System.Net;
+using zipkin4net.Transport.Http;
 
 namespace Resilience.Http
 {
@@ -27,9 +28,12 @@ namespace Resilience.Http
         private ILogger<ResilienceHttpClient> _logger;
         private IHttpContextAccessor _httpContextAccessor;
 
-        public ResilienceHttpClient(Func<string, IEnumerable<Policy>> policyCreator, ILogger<ResilienceHttpClient> logger, IHttpContextAccessor httpContextAccessor)
+        public ResilienceHttpClient(string applicationName,
+            Func<string, IEnumerable<Policy>> policyCreator,
+            ILogger<ResilienceHttpClient> logger,
+            IHttpContextAccessor httpContextAccessor)
         {
-            _httpClient = new HttpClient();
+            _httpClient = new HttpClient(new TracingHandler(applicationName));
             _policyCreator = policyCreator;
             _policyWrappers = new ConcurrentDictionary<string, PolicyWrap>();
             _httpContextAccessor = httpContextAccessor;
@@ -44,7 +48,7 @@ namespace Resilience.Http
         public Task<HttpResponseMessage> PostAsync<T>(string uri, T item, string authorizationToken = null, string requestId = null, string authorizationMethod = "Bearer")
         {
             Func<HttpRequestMessage> func = () => CreateHttpRequestMessage(HttpMethod.Post, uri, item);
-            return  DoPostAsync(HttpMethod.Post, uri, func, authorizationToken, requestId, authorizationMethod);
+            return DoPostAsync(HttpMethod.Post, uri, func, authorizationToken, requestId, authorizationMethod);
         }
 
         private HttpRequestMessage CreateHttpRequestMessage<T>(HttpMethod method, string url, T item)
@@ -148,7 +152,7 @@ namespace Resilience.Http
             {
                 var requestMessage = new HttpRequestMessage(HttpMethod.Get, uri);
 
-                
+
 
                 if (authorizationToken != null)
                 {

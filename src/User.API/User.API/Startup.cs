@@ -16,7 +16,11 @@ using Microsoft.Extensions.Options;
 using User.API.Data;
 using User.API.Dtos;
 using User.API.Filters;
-
+using zipkin4net;
+using zipkin4net.Middleware;
+using zipkin4net.Tracers;
+using zipkin4net.Tracers.Zipkin;
+using zipkin4net.Transport.Http;
 
 namespace User.API
 {
@@ -133,6 +137,8 @@ namespace User.API
 
             #endregion --服务发现注册--
 
+            RegisterZipKinTrace(app, loggerFactory, applicationLifetime);
+
             // app.UseCap();//2.3版本之后不再需要注册
             //身份认证管道配置
             app.UseAuthentication();
@@ -141,6 +147,29 @@ namespace User.API
 
             //执行数据库迁移
             UserContextSeed.SeedAsync(app, loggerFactory).Wait();
+        }
+
+        private void RegisterZipKinTrace(IApplicationBuilder applicationBuilder,
+          ILoggerFactory loggerFactory,
+          IApplicationLifetime applicationLifetime)
+        {
+            applicationLifetime.ApplicationStarted.Register(() =>
+            {
+                TraceManager.SamplingRate = 1.0f;
+                var logger = new TracingLogger(loggerFactory, "zipkin4net");
+                var httpSender = new HttpZipkinSender("http://192.168.1.110:9411", "application/json");
+                var tracer = new ZipkinTracer(httpSender, new JSONSpanSerializer(), new Statistics());//注意github 示例上只提供了第一个参数,会报错
+
+                var consoleTracer = new ConsoleTracer();
+
+                TraceManager.RegisterTracer(tracer);
+                TraceManager.RegisterTracer(consoleTracer);
+                TraceManager.Start(logger);
+            });
+
+            applicationLifetime.ApplicationStopped.Register(() => TraceManager.Stop());
+            applicationBuilder.UseTracing("user_api");
+
         }
 
         #region --服务发现注册--

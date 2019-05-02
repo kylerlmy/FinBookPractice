@@ -18,6 +18,11 @@ using User.Identity.Authentication;
 using User.Identity.Dtos;
 using User.Identity.Infrastructure;
 using User.Identity.Services;
+using zipkin4net;
+using zipkin4net.Middleware;
+using zipkin4net.Tracers;
+using zipkin4net.Tracers.Zipkin;
+using zipkin4net.Transport.Http;
 
 namespace User.Identity
 {
@@ -77,13 +82,42 @@ namespace User.Identity
             services.AddMvc();
         }
 
+        private void RegisterZipKinTrace(IApplicationBuilder applicationBuilder,
+            ILoggerFactory loggerFactory,
+            IApplicationLifetime applicationLifetime)
+        {
+            applicationLifetime.ApplicationStarted.Register(() =>
+            {
+                TraceManager.SamplingRate = 1.0f;
+                var logger = new TracingLogger(loggerFactory, "zipkin4net");
+                var httpSender = new HttpZipkinSender("http://192.168.1.110:9411", "application/json");
+                var tracer = new ZipkinTracer(httpSender, new JSONSpanSerializer(), new Statistics());//注意github 示例上只提供了第一个参数,会报错
+
+                var consoleTracer = new ConsoleTracer();
+
+                TraceManager.RegisterTracer(tracer);
+                TraceManager.RegisterTracer(consoleTracer);
+                TraceManager.Start(logger);
+            });
+
+            applicationLifetime.ApplicationStopped.Register(() => TraceManager.Stop());
+            applicationBuilder.UseTracing("identity_api");
+
+        }
+
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app,
+            IHostingEnvironment env,
+            ILoggerFactory logger,
+            IApplicationLifetime lifetime)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            RegisterZipKinTrace(app, logger, lifetime);
 
             app.UseIdentityServer();
             //app.UseIdentity();
